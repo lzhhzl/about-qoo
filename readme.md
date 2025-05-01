@@ -3,7 +3,7 @@
 
 DATA内的QPI和QPK一一对应，QPI应该是记录QPK封包内文件偏移位和偏移量的，QPK内多数文件是CZL头的zlib压缩数据
 
-IDX文件夹下的HKT文件疑似记录了QPI的相应读取结构和QPK封包内文件更详细的文件名（较为明显的字符串已提取到[string_in_HKT](.\string_in_HKT.txt)），但是不知道如何确定HKT内相应偏移量及其对应QPK内具体文件数据
+IDX文件夹下的HKT文件疑似记录了QPI的相应读取结构和QPK封包内文件更详细的文件名（较为明显的字符串已提取到[string_in_HKT](string_in_HKT.txt)），但是不知道如何确定HKT内相应偏移量及其对应QPK内具体文件数据
 
 在eboot中HKT的引用在sub_81009EAA内（可能相关的计算函数sub_810937CE和sub_8109A8BC），流程似乎是将HKT内容读入解析后再读取解析各个QPI和QPK封包，先读完所有QPI再读取所有QPK
 
