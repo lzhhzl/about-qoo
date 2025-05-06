@@ -5,11 +5,23 @@ DATA内的QPI和QPK一一对应，QPI应该是记录QPK封包内文件偏移位�
 
 IDX文件夹下的HKT文件疑似记录了QPI的相应读取结构和QPK封包内文件更详细的文件名（较为明显的字符串已提取到[string_in_HKT](string_in_HKT.txt)），但是不知道如何确定HKT内相应偏移量及其对应QPK内具体文件数据
 
-在eboot中HKT的引用在sub_81009EAA内（可能相关的计算函数sub_810937CE和sub_8109A8BC），流程似乎是将HKT内容读入解析后再读取解析各个QPI和QPK封包，先读完所有QPI再读取所有QPK
+在eboot中HKT的引用在sub_81009EAA内（可能相关的计算函数sub_8100AA02、sub_810937CE和sub_8109A8BC），流程似乎是将HKT内容读入解析后再读取解析各个QPI和QPK封包，先读完所有QPI再读取所有QPK
 
 在sub_81009EAA结束后sub_8100A1EA开始读取解析sys.hdg(在HOTDOG封包内的一个小封包)
 
-**关于[kurrimu的相关插件脚本](https://github.com/IcySon55/Kuriimu/issues/518)及对QPI和QPK文件的进一步分析**
+
+
+**目前可用的工具**
+
+kurrimu对 心之国的爱丽丝 的[相关插件脚本](https://github.com/IcySon55/Kuriimu/issues/518)
+
+Garbro早期对psp上同引擎的[分析](https://github.com/crskycode/GARbro/blob/master/ArcFormats/Psp/ArcQPK.cs)，可以直接使用解包
+
+自己基于上述制作的QPK解包[py脚本](https://github.com/lzhhzl/about-qoo/blob/master/qpk_qpi.py)（还在完善中，目前不能通用)
+
+
+
+**关于对HKT、QPI和QPK文件的进一步分析**
 
 *以下都按偏移量为0x04的小端数据进行分析*
 
@@ -43,7 +55,7 @@ IDX文件夹下的HKT文件疑似记录了QPI的相应读取结构和QPK封包�
 
 - AKB文件，在KS.QPK中的首个文件(名为kslist.akb)
 
-- GOF 字库文件
+- GOF 字库文件 已放在font文件夹下，其中含有非等宽的无压缩字形的tile
 
 - HOTDOG封包内的HDG文件
 疑似也是一种封包，里面含有若干个CZL文件(疑似为TGA图像)
