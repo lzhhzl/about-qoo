@@ -17,7 +17,7 @@ kurrimu对 心之国的爱丽丝 的[相关插件脚本](https://github.com/IcyS
 
 Garbro早期对psp上同引擎的[分析](https://github.com/crskycode/GARbro/blob/master/ArcFormats/Psp/ArcQPK.cs)，可以直接使用解包
 
-自己基于上述制作的QPK解包[py脚本](https://github.com/lzhhzl/about-qoo/blob/master/qpk_qpi.py)（还在完善中，目前不能通用)
+自己基于上述制作的QPK解包[py脚本](https://github.com/lzhhzl/about-qoo/blob/master/qpk_qpi.py)
 
 
 
@@ -32,22 +32,23 @@ Garbro早期对psp上同引擎的[分析](https://github.com/crskycode/GARbro/bl
   - 0x13CF0-0x264C7 含有一些疑似指令和QPK封包内的相关文件名的字符串，似乎是以 "PACK\_封包名_TOP" 开始记述各个封包文件
 
 - QPI内
-  - 0x04-0x07 kurrimu脚本猜测是封入的文件数量，但是与相应QPK中的实际文件数对不上
-  - 0x08-0x0F 不论哪个QPI/QPK这一段都是 07 E3 06 0D 14 05 25 00，可能是版本号或者是特征信息
-  - 0x10-0x13  00 00 00 00 间隔
-  - 0x14开始向后偏移 有若干个由 14 00 00 00 和 00 00 00 80 组成的间隔，但是数量不固定，直至某一位开始为 00 08 00 00，即是QPK内第一个封包文件的起始偏移位，形式为 "偏移位(0x04) 偏移量(0x04，需要偏移量&0x3FFFFFFF才能得到文件实际偏移量)"
-  - 依据HKT内记录的相应封包内的文件名计算文件数并依次读取后（文件数*0x08），会用若干个形式为 "对应QPK文件大小的偏移量(0x04) 00 00 00 80" 表示截止
-  - 结尾都是形式为 "对应QPK文件大小的偏移量(0x04) 00 00 00 00"
+  - 0x04-0x07 猜测是封入的文件数量count，可能包括了开头和结尾的padding，总是比实际文件数大
+  - 0x08-0x0F 不论哪个QPI/QPK都是 07 E3 06 0D 14 05 25 00，可能是版本号或者是特征信息
+  - 0x10-0x13  0x00 block
+  - 0x14开始 多个offset-size，开头有若干个由 14 00 00 00（offset） 和 00 00 00 80 (size，实则空文件）组成的疑似padding，生成数量为止，直至某一位开始offset为 00 08 00 00，即QPK封包内第一个文件的起始偏移位，有效文件的offset-size形式为 "偏移位(0x04) 偏移量(0x04，需要偏移量&0x3FFFFFFF才能得到文件实际偏移量)"
+  - 读取完所有有效文件后，结尾会有少数形式为 "xx xx xx xx(0x04，QPK文件大小) 00 00 00 80" 的数据块，疑似也是一种padding，而最后一个数据块始终是 "xx xx xx xx(0x04，QPK文件大小) 00 00 00 00"
+  - 依据HKT内记录的字符串可找到相应封包内的文件名，以此计算实际文件数
 
 - QPK内
   - 0x04-0x07 与相应QPI数据一致
   
   - 0x08-0x0F 和相应QPI一致，这一段都是 07 E3 06 0D 14 05 25 00
   
-  - 0x10-0x7FF 类似padding一样的 全00 间隔，间隔确保封包内第一个文件都是从0x800开始计算起，各个封包内文件数据间用若干个 全00 间隔
+  - 0x10-0x7FF 类似padding一样的 全00 间隔，间隔确保封包内第一个文件都是从0x800开始存储，之后各个封包内文件数据间用若干个 全00 间隔
 
 - QPK封包内的CZL
-  - 0x04-0x0B CZL压缩数据的偏移量
+  - 0x04-0x07 CZL压缩数据的偏移量
+  - 0x08-0x0B 未知
   - 0xC-(0xC+CZL压缩数据的偏移量&0x3FFFFFFF) Zlib压缩数据
   
 

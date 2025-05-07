@@ -4,10 +4,10 @@ import zlib
 
 def main():
     # 设置当前工作目录为脚本所在的目录
-    current_script_path = r"D:\Program\qoo"
+    current_script_path = r"D:\Program\qoo"  # change work dir here
     os.chdir(current_script_path)
     
-    file = "KS"
+    file = "GOF"  # change pack name here
     qpi_path = file + ".QPI"
     qpk_path = file + ".QPK"
     
@@ -19,13 +19,15 @@ def main():
         print(header.decode('ascii'))
         
         # 读取文件数量（4 字节）
-        count = struct.unpack('<I', br[4:8])[0]  # 估计不是正确的数量
-        count = 6  # 这里依据HKT中记载的文件数量自行设置
+        count = struct.unpack('<I', br[4:8])[0]  # 该数量涵盖了若干个开头和结尾偏移量为 0x80(小端位00000080) 的offset-size(可能是padding)
         print(f"File Count: {count}")
         
-        # 0x800 Alignment(QPK file start-offset)
-        br = br[0x1C:]  # 这里应该是从QPI记载着偏移量0x800(小端位00800000)的开始读取
+        # 0x08-0x0F maybe version
+        # 0x10-0x13 0x00 block
+        br = br[0x14:]  # offset-size start
         
+        # IN QPK file, magic(0x00-0x03) count(0x04-0x07) version(0x08-0x0F)
+        # After 0x10-0x7FF block(size 0x7F0), then first file start-offset(0x800)
         with open(qpk_path, 'rb') as qpk:
             br2 = qpk.read()
             
@@ -41,7 +43,8 @@ def main():
                 ext = ".qfi"
                 
                 if (size & 0x80000000) >> 31 == 1:  # Empty File空文件
-                    print("Empty File")
+                    # print("Empty File")
+                    continue
                 elif (size & 0x40000000) >> 30 == 1:  # Compressed File压缩文件
                     if br2[offset:offset+4].decode('ascii') == "CZL\x00":
                         ext = ".czl"
