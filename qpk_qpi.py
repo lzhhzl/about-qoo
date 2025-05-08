@@ -46,6 +46,7 @@ def main():
                     # print("Empty File")
                     continue
                 elif (size & 0x40000000) >> 30 == 1:  # Compressed File压缩文件
+                    # 对于CZL数据来说，(size & 0x3FFFFFFF)相当于压缩前的文件大小
                     if br2[offset:offset+4].decode('ascii') == "CZL\x00":
                         ext = ".czl"
                         isCZL = True

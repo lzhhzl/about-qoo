@@ -41,14 +41,13 @@ Garbro早期对psp上同引擎的[分析](https://github.com/crskycode/GARbro/bl
 
 - QPK内
   - 0x04-0x07 与相应QPI数据一致
-  
   - 0x08-0x0F 和相应QPI一致，这一段都是 07 E3 06 0D 14 05 25 00
+  - 0x10-0x7FF 类似padding一样的 0x00 间隔（怀疑应该和QPI一样0x10-0x13为0x00*4个block，从0x14开始0x00\*0x7EC padding），间隔确保封包内第一个文件都是从0x800开始存储
+  - 之后各个封包内文件数据间用 各文件nbyte为整除2048而补齐若干个0x00 间隔
   
-  - 0x10-0x7FF 类似padding一样的 全00 间隔，间隔确保封包内第一个文件都是从0x800开始存储，之后各个封包内文件数据间用若干个 全00 间隔
-
 - QPK封包内的CZL
   - 0x04-0x07 CZL压缩数据的偏移量
-  - 0x08-0x0B 未知
+  - 0x08-0x0B 压缩前的数据大小
   - 0xC-(0xC+CZL压缩数据的偏移量&0x3FFFFFFF) Zlib压缩数据
   
 
@@ -56,7 +55,7 @@ Garbro早期对psp上同引擎的[分析](https://github.com/crskycode/GARbro/bl
 
 - AKB文件，在KS.QPK中的首个文件(名为kslist.akb)
 
-- GOF 字库文件 已放在font文件夹下，其中含有非等宽的无压缩字形的tile
+- GOF 字库文件 已放在font文件夹下，其中含有非等宽的无压缩字形的tile([working in TileViewer](https://github.com/YuriSizuku/TileViewer/wiki/Font-Database))
 
 - HOTDOG封包内的HDG文件
 疑似也是一种封包，里面含有若干个CZL文件(疑似为TGA图像)
